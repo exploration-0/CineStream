@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineStream | Premium Movie Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --primary-black: #0a0a0a;
+            --secondary-black: #1a1a1a;
+            --accent-black: #2a2a2a;
+            --primary-white: #ffffff;
+            --secondary-white: #f0f0f0;
+            --accent-white: #e0e0e0;
+            --highlight: #e50914;
+            --highlight-hover: #b20710;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --admin-color: #00a8ff;
+            --info: #17a2b8;
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-black);
+            color: var(--primary-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        /* ===== HEADER & NAVIGATION ===== */
+        header {
+            background-color: rgba(10, 10, 10, 0.98);
+            padding: 1.2rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--highlight);
+            font-size: 2.2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.9rem;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            background: linear-gradient(45deg, var(--primary-white), var(--accent-white));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ===== CLEAN SEARCH BAR ===== */
+        .search-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: var(--primary-white);
+            font-size: 1rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--highlight);
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-input::placeholder {
+            color: var(--accent-white);
+            opacity: 0.6;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--highlight);
+            border: none;
+            color: var(--primary-white);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .search-button:hover {
+            background: var(--highlight-hover);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* ===== SEARCH RESULTS ===== */
+        .search-results {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            right: 0;
+            background: var(--secondary-black);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            max-height: 500px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .search-results.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-result-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-result-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .search-result-item img {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--primary-white);
+        }
+
+        .search-result-info p {
+            font-size: 0.9rem;
+            color: var(--accent-white);
+            opacity: 0.8;
+        }
+
+        .no-results {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--accent-white);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* ===== MOBILE MENU ===== */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--secondary-white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary-white);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--highlight);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            margin-top: 80px;
+            padding: 8rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.9), rgba(26, 26, 26, 0.9)),
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1925&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(229, 9, 20, 0.1), rgba(0, 168, 255, 0.1));
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.8);
+            line-height: 1.2;
+            background: linear-gradient(45deg, var(--primary-white), var(--accent-white));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            color: var(--accent-white);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* ===== MOVIES SECTION ===== */
+        .movies-section {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 5px;
+            background: var(--highlight);
+            border-radius: 5px;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        /* ===== MOVIE CARD ===== */
+        .movie-card {
+            background: var(--secondary-black);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(229, 9, 20, 0.2);
+            border-color: rgba(229, 9, 20, 0.3);
+        }
+
+        .movie-poster-container {
+            position: relative;
+            overflow: hidden;
+            height: 380px;
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s;
+        }
+
+        .movie-card:hover .movie-poster {
+            transform: scale(1.1);
+        }
+
+        .movie-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--highlight);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            z-index: 1;
+        }
+
+        .movie-info {
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .movie-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-white);
+            line-height: 1.3;
+            font-weight: 700;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--accent-white);
+        }
+
+        .movie-rating {
+            color: #ffcc00;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .movie-genre {
+            background: var(--accent-black);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .movie-description {
+            color: var(--accent-white);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .watch-now-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--highlight);
+            color: var(--primary-white);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .watch-now-btn:hover {
+            background: var(--highlight-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.3);
+        }
+
+        /* ===== ADMIN LOGIN MODAL ===== */
+        .admin-login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-login-modal.active {
+            display: flex;
+        }
+
+        .login-form {
+            background: var(--secondary-black);
+            padding: 4rem;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 30px 80px rgba(0, 168, 255, 0.4);
+            border: 1px solid rgba(0, 168, 255, 0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-form h3 {
+            color: var(--primary-white);
+            margin-bottom: 2.5rem;
+            text-align: center;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .login-error {
+            color: var(--danger);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 0.95rem;
+            padding: 15px;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--accent-white);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-black);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--primary-white);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--admin-color);
+            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.2);
+            background: rgba(0, 168, 255, 0.05);
+        }
+
+        .login-actions {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+            padding-top: 2.5rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--admin-color);
+            color: var(--primary-white);
+            box-shadow: 0 8px 20px rgba(0, 168, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #0097e6;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 168, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--accent-black);
+            color: var(--accent-white);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== ADMIN PANEL OVERLAY ===== */
+        .admin-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 2000;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .admin-overlay.active {
+            display: block;
+        }
+
+        .admin-panel {
+            max-width: 1300px;
+            margin: 2rem auto;
+            background: var(--secondary-black);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 90px rgba(0, 168, 255, 0.3);
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--admin-color), #0097e6);
+            padding: 1.8rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h2 {
+            color: var(--primary-white);
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-admin {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--primary-white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-admin:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* ===== ADMIN CONTENT ===== */
+        .admin-content {
+            padding: 2.5rem;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+            background: var(--accent-black);
+            padding: 15px;
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: var(--accent-white);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .admin-tab.active {
+            background: var(--admin-color);
+            color: var(--primary-white);
+            box-shadow: 0 8px 25px rgba(0, 168, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .admin-form {
+            display: none;
+        }
+
+        .admin-form.active {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--primary-white);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--primary-white);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        /* ===== MOVIES LIST IN ADMIN ===== */
+        .movies-list-container {
+            background: var(--accent-black);
+            border-radius: 15px;
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .movies-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .movies-list-header h3 {
+            color: var(--primary-white);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .movies-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .movie-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--secondary-black);
+            border-radius: 12px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .movie-list-item:hover {
+            transform: translateX(10px);
+            border-color: rgba(0, 168, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 168, 255, 0.2);
+        }
+
+        .movie-list-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .movie-list-info h4 {
+            color: var(--primary-white);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .movie-list-info p {
+            color: var(--accent-white);
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .movie-list-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .edit-btn {
+            background: var(--warning);
+            color: var(--primary-black);
+        }
+
+        .edit-btn:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: var(--primary-white);
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .preview-btn {
+            background: var(--info);
+            color: var(--primary-white);
+        }
+
+        .preview-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: linear-gradient(180deg, var(--accent-black), var(--primary-black));
+            padding: 5rem 2rem 2rem;
+            margin-top: 6rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 4rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary-white);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--highlight);
+            border-radius: 2px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-links li a {
+            color: var(--accent-white);
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .footer-links li a:hover {
+            color: var(--primary-white);
+            transform: translateX(10px);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-white);
+            font-size: 0.95rem;
+        }
+
+        /* ===== NOTIFICATIONS ===== */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 20px 25px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 400px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, var(--success), #218838);
+            border-color: rgba(40, 167, 69, 0.3);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger), #c82333);
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, var(--info), #138496);
+            border-color: rgba(23, 162, 184, 0.3);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .admin-tabs {
+                flex-direction: column;
+            }
+            
+            .admin-tab {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .search-container {
+                order: 3;
+                margin: 1rem 0 0;
+                max-width: 100%;
+            }
+            
+            .search-button span {
+                display: none;
+            }
+            
+            .search-button {
+                padding: 12px;
+                min-width: 50px;
+                width: 50px;
+                height: 50px;
+                justify-content: center;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--secondary-black);
+                padding: 1.5rem;
+                flex-direction: column;
+                gap: 1.5rem;
+                display: none;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                z-index: 999;
+            }
+            
+            nav.active {
+                display: flex;
+            }
+            
+            .hero {
+                padding: 6rem 1.5rem;
+                margin-top: 70px;
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            .movies-section {
+                padding: 4rem 1.5rem;
+            }
+            
+            .admin-panel {
+                margin: 1rem;
+            }
+            
+            .admin-content {
+                padding: 1.5rem;
+            }
+            
+            .movie-list-item {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .movie-list-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .login-form {
+                padding: 3rem 2rem;
+                margin: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .movies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-actions, .login-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Clean Search Bar -->
+    <header>
+        <a href="#" class="logo">
+            <i class="fas fa-film"></i>
+            <h1>CineStream</h1>
+        </a>
+        
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" 
+                       class="search-input" 
+                       placeholder="Search movies by title, genre, or description..."
+                       id="searchInput"
+                       autocomplete="off">
+                <button class="search-button" id="searchButton">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </button>
+                <div class="search-results" id="searchResults">
+                    <!-- Search results will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <nav id="mainNav">
+            <a href="#home"><i class="fas fa-home"></i> Home</a>
+            <a href="#movies"><i class="fas fa-film"></i> Movies</a>
+            <a href="#trending"><i class="fas fa-fire"></i> Trending</a>
+            <a href="#new"><i class="fas fa-star"></i> New Releases</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>Unlimited Movies, TV Shows & More</h2>
+            <p>Stream thousands of movies and TV shows with direct watch links. All movies are managed through a secure admin panel.</p>
+        </div>
+    </section>
+
+    <!-- Movies Section -->
+    <section class="movies-section" id="movies">
+        <h2 class="section-title">Featured Movies</h2>
+        <div class="movies-grid" id="moviesGrid">
+            <!-- Movies will be dynamically loaded here -->
+        </div>
+    </section>
+
+    <!-- Admin Login Modal -->
+    <div class="admin-login-modal" id="adminLoginModal">
+        <div class="login-form">
+            <h3>
+                <i class="fas fa-lock"></i>
+                Admin Authentication
+            </h3>
+            <div class="login-error hidden" id="loginError">
+                <i class="fas fa-exclamation-circle"></i> Invalid username or password
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" class="form-control" required
+                           placeholder="Enter admin username">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" class="form-control" required
+                           placeholder="Enter admin password">
+                </div>
+                <div class="login-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancelLogin">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel Overlay -->
+    <div class="admin-overlay" id="adminOverlay">
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>
+                    <i class="fas fa-cogs"></i>
+                    Admin Control Panel
+                </h2>
+                <button class="close-admin" id="closeAdmin">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="admin-content">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="add-movie">
+                        <i class="fas fa-plus-circle"></i> Add New Movie
+                    </button>
+                    <button class="admin-tab" data-tab="manage-movies">
+                        <i class="fas fa-edit"></i> Manage All Movies
+                    </button>
+                    <button class="admin-tab" data-tab="bulk-actions">
+                        <i class="fas fa-tasks"></i> Bulk Actions
+                    </button>
+                </div>
+                
+                <!-- Add Movie Form -->
+                <div class="admin-form active" id="add-movie-form">
+                    <form id="movieForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="movieTitle"><i class="fas fa-film"></i> Movie Title *</label>
+                                <input type="text" id="movieTitle" class="form-control" required 
+                                       placeholder="Enter movie title">
+                            </div>
+                            <div class="form-group">
+                                <label for="movieYear"><i class="fas fa-calendar-alt"></i> Release Year *</label>
+                                <input type="number" id="movieYear" class="form-control" 
+                                       min="1900" max="2030" required
+                                       placeholder="2024">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="movieDescription"><i class="fas fa-align-left"></i> Description *</label>
+                            <textarea id="movieDescription" class="form-control" rows="4" required
+                                      placeholder="Enter movie description"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="movieGenre"><i class="fas fa-tags"></i> Genre *</label>
+                                <input type="text" id="movieGenre" class="form-control" required
+                                       placeholder="Action, Drama, Sci-Fi">
+                            </div>
+                            <div class="form-group">
+                                <label for="movieRating"><i class="fas fa-star"></i> Rating (1-10) *</label>
+                                <input type="number" id="movieRating" class="form-control" 
+                                       min="1" max="10" step="0.1" required
+                                       placeholder="8.5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="movieImage"><i class="fas fa-image"></i> Image URL *</label>
+                                <input type="url" id="movieImage" class="form-control" required
+                                       placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label for="movieWatchLink"><i class="fas fa-play-circle"></i> Watch Link *</label>
+                                <input type="url" id="movieWatchLink" class="form-control" required
+                                       placeholder="https://example.com/watch">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="movieActors"><i class="fas fa-users"></i> Actors</label>
+                                <input type="text" id="movieActors" class="form-control"
+                                       placeholder="Actor 1, Actor 2, Actor 3">
+                            </div>
+                            <div class="form-group">
+                                <label for="movieDuration"><i class="fas fa-clock"></i> Duration (minutes)</label>
+                                <input type="number" id="movieDuration" class="form-control"
+                                       placeholder="120">
+                            </div>
+                        </div>
+                        
+                        <div class="admin-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Add Movie
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Clear Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Manage Movies -->
+                <div class="admin-form" id="manage-movies-form">
+                    <div class="movies-list-container">
+                        <div class="movies-list-header">
+                            <h3><i class="fas fa-list"></i> All Movies</h3>
+                            <div style="color: var(--accent-white); font-size: 0.9rem;">
+                                <span id="movieCount">0</span> movies total
+                            </div>
+                        </div>
+                        <div class="movies-list" id="adminMoviesList">
+                            <!-- Movies list will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bulk Actions -->
+                <div class="admin-form" id="bulk-actions-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-tasks"></i> Bulk Operations</label>
+                        <div style="color: var(--accent-white); margin-top: 1rem; padding: 2rem; background: var(--accent-black); border-radius: 15px;">
+                            <h4 style="color: var(--admin-color); margin-bottom: 1.5rem;">Database Management</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                                <div style="padding: 1.5rem; background: rgba(0, 168, 255, 0.1); border-radius: 10px; border: 2px solid rgba(0, 168, 255, 0.2);">
+                                    <h5 style="color: var(--primary-white); margin-bottom: 0.8rem;">Export Database</h5>
+                                    <p style="font-size: 0.95rem; margin-bottom: 1.2rem;">Export all movies to JSON file</p>
+                                    <button class="btn btn-primary" style="width: 100%;" id="exportBtn">
+                                        <i class="fas fa-download"></i> Export Now
+                                    </button>
+                                </div>
+                                <div style="padding: 1.5rem; background: rgba(40, 167, 69, 0.1); border-radius: 10px; border: 2px solid rgba(40, 167, 69, 0.2);">
+                                    <h5 style="color: var(--primary-white); margin-bottom: 0.8rem;">Import Database</h5>
+                                    <p style="font-size: 0.95rem; margin-bottom: 1.2rem;">Import movies from JSON file</p>
+                                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                                    <button class="btn btn-success" style="width: 100%;" id="importBtn">
+                                        <i class="fas fa-upload"></i> Choose File
+                                    </button>
+                                </div>
+                                <div style="padding: 1.5rem; background: rgba(220, 53, 69, 0.1); border-radius: 10px; border: 2px solid rgba(220, 53, 69, 0.2);">
+                                    <h5 style="color: var(--primary-white); margin-bottom: 0.8rem;">Clear Database</h5>
+                                    <p style="font-size: 0.95rem; margin-bottom: 1.2rem;">Remove all movies (Danger)</p>
+                                    <button class="btn btn-danger" style="width: 100%;" id="clearAllBtn">
+                                        <i class="fas fa-exclamation-triangle"></i> Clear All
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CineStream</h3>
+                <p>Your premium destination for streaming movies with direct watch links and secure admin management.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="#movies"><i class="fas fa-chevron-right"></i> Movies</a></li>
+                    <li><a href="#trending"><i class="fas fa-chevron-right"></i> Trending</a></li>
+                    <li><a href="#new"><i class="fas fa-chevron-right"></i> New Releases</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><a href="mailto:support@cinestream.com"><i class="fas fa-envelope"></i> support@cinestream.com</a></li>
+                    <li><a href="tel:+11234567890"><i class="fas fa-phone"></i> +1 (123) 456-7890</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2024 CineStream. All rights reserved. | Secure Admin Panel: Type "admin" in search and press Enter</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==============================================
+        // CONFIGURATION & SECURITY SETTINGS
+        // ==============================================
+        const CONFIG = {
+            ADMIN_USERNAME: 'admin',
+            ADMIN_PASSWORD: 'admin123',
+            LOCAL_STORAGE_KEY: 'cinestream_movies_db',
+            AUTO_LOGOUT_MINUTES: 30
+        };
+
+        // ==============================================
+        // APPLICATION STATE
+        // ==============================================
+        let moviesDatabase = JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEY)) || [
+            {
+                id: 1,
+                title: "The Last Frontier",
+                description: "In a dystopian future, a group of rebels fight against an oppressive AI regime. The fate of humanity hangs in the balance.",
+                genre: "Sci-Fi",
+                year: 2023,
+                rating: 8.7,
+                imageUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401",
+                watchLink: "https://example.com/watch/the-last-frontier",
+                actors: "Chris Evans, Scarlett Johansson",
+                duration: 148
+            },
+            {
+                id: 2,
+                title: "Midnight in Paris",
+                description: "A romantic time-travel adventure through the streets of Paris. A writer discovers the city's magical secrets after midnight.",
+                genre: "Romance",
+                year: 2022,
+                rating: 7.9,
+                imageUrl: "https://images.unsplash.com/photo-1489599809516-9827b6d1cf13",
+                watchLink: "https://articale.noend.website/",
+                actors: "Owen Wilson, Rachel McAdams",
+                duration: 112
+            },
+            {
+                id: 3,
+                title: "Ocean's Legacy",
+                description: "An epic underwater adventure exploring the deepest trenches of the ocean. Ancient secrets threaten to reshape our world.",
+                genre: "Adventure",
+                year: 2023,
+                rating: 8.2,
+                imageUrl: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078",
+                watchLink: "https://example.com/watch/oceans-legacy",
+                actors: "Jason Momoa, Emily Blunt",
+                duration: 135
+            }
+        ];
+
+        let isAdminAuthenticated = false;
+        let autoLogoutTimer = null;
+
+        // ==============================================
+        // SEARCH FUNCTIONALITY
+        // ==============================================
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const searchResults = document.getElementById('searchResults');
+
+            // Search on button click
+            searchButton.addEventListener('click', performSearch);
+
+            // Search on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    // Check if user typed "admin" (exact match)
+                    if (this.value.trim().toLowerCase() === 'admin') {
+                        this.value = ''; // Clear search input
+                        showAdminLoginModal();
+                        return;
+                    }
+                    performSearch();
+                }
+            });
+
+            // Real-time search as user types
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(performSearch, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && 
+                    !searchResults.contains(e.target) && 
+                    !searchButton.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+
+            function performSearch() {
+                const query = searchInput.value.trim().toLowerCase();
+                
+                if (query.length === 0) {
+                    searchResults.classList.remove('active');
+                    return;
+                }
+
+                // Filter movies based on search query
+                const filteredMovies = moviesDatabase.filter(movie => 
+                    movie.title.toLowerCase().includes(query) ||
+                    movie.description.toLowerCase().includes(query) ||
+                    movie.genre.toLowerCase().includes(query) ||
+                    movie.actors.toLowerCase().includes(query)
+                );
+
+                displaySearchResults(filteredMovies, query);
+            }
+
+            function displaySearchResults(results, query) {
+                const searchResultsList = document.getElementById('searchResults');
+                searchResultsList.innerHTML = '';
+
+                if (results.length === 0) {
+                    searchResultsList.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-search"></i>
+                            <p>No results found for "${query}"</p>
+                        </div>
+                    `;
+                } else {
+                    results.forEach(movie => {
+                        const item = document.createElement('div');
+                        item.className = 'search-result-item';
+                        item.innerHTML = `
+                            <img src="${movie.imageUrl}" alt="${movie.title}">
+                            <div class="search-result-info">
+                                <h4>${movie.title} (${movie.year})</h4>
+                                <p>${movie.genre} • Rating: ${movie.rating}/10</p>
+                                <p>${movie.description.substring(0, 80)}...</p>
+                            </div>
+                        `;
+                        
+                        item.addEventListener('click', () => {
+                            window.open(movie.watchLink, '_blank');
+                            searchResults.classList.remove('active');
+                            searchInput.value = '';
+                        });
+                        
+                        searchResultsList.appendChild(item);
+                    });
+                }
+                
+                searchResultsList.classList.add('active');
+            }
+        }
+
+        // ==============================================
+        // MOVIE DISPLAY FUNCTIONS
+        // ==============================================
+        function renderMovies() {
+            const moviesGrid = document.getElementById('moviesGrid');
+            moviesGrid.innerHTML = '';
+            
+            if (moviesDatabase.length === 0) {
+                moviesGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--accent-white);">
+                        <h3 style="font-size: 1.8rem; margin-bottom: 1rem;">No Movies Available</h3>
+                        <p>Admin can add movies by typing "admin" in search bar and pressing Enter</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            moviesDatabase.forEach(movie => {
+                const movieCard = createMovieCard(movie);
+                moviesGrid.appendChild(movieCard);
+            });
+        }
+
+        function createMovieCard(movie) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            
+            card.innerHTML = `
+                <div class="movie-poster-container">
+                    <img src="${movie.imageUrl}" alt="${movie.title}" class="movie-poster" loading="lazy">
+                    <div class="movie-badge">${movie.genre}</div>
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-title">${movie.title}</h3>
+                    <div class="movie-meta">
+                        <span class="movie-rating">
+                            <i class="fas fa-star"></i> ${movie.rating}/10
+                        </span>
+                        <span class="movie-genre">${movie.year}</span>
+                    </div>
+                    <p class="movie-description">${movie.description}</p>
+                    <a href="${movie.watchLink}" target="_blank" class="watch-now-btn">
+                        <i class="fas fa-play-circle"></i> Watch Now
+                    </a>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // ==============================================
+        // ADMIN LOGIN FUNCTIONS
+        // ==============================================
+        function showAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.add('active');
+            document.getElementById('adminUsername').focus();
+        }
+
+        function hideAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.remove('active');
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function authenticate(username, password) {
+            return username === CONFIG.ADMIN_USERNAME && password === CONFIG.ADMIN_PASSWORD;
+        }
+
+        // ==============================================
+        // ADMIN PANEL FUNCTIONS
+        // ==============================================
+        function showAdminPanel() {
+            document.getElementById('adminOverlay').classList.add('active');
+            loadAdminMoviesList();
+            resetAutoLogoutTimer();
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('adminOverlay').classList.remove('active');
+            isAdminAuthenticated = false;
+            if (autoLogoutTimer) {
+                clearTimeout(autoLogoutTimer);
+            }
+        }
+
+        function resetAutoLogoutTimer() {
+            if (autoLogoutTimer) {
+                clearTimeout(autoLogoutTimer);
+            }
+            
+            autoLogoutTimer = setTimeout(() => {
+                hideAdminPanel();
+                showNotification('Admin session expired. Please login again.', 'error');
+            }, CONFIG.AUTO_LOGOUT_MINUTES * 60 * 1000);
+        }
+
+        // ==============================================
+        // MOVIE MANAGEMENT FUNCTIONS
+        // ==============================================
+        function saveMoviesDatabase() {
+            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, JSON.stringify(moviesDatabase));
+            renderMovies(); // Live update on website
+            showNotification('Changes saved successfully! Website updated live.', 'success');
+        }
+
+        function loadAdminMoviesList() {
+            const moviesList = document.getElementById('adminMoviesList');
+            const movieCount = document.getElementById('movieCount');
+            
+            moviesList.innerHTML = '';
+            movieCount.textContent = moviesDatabase.length;
+            
+            if (moviesDatabase.length === 0) {
+                moviesList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--accent-white);">
+                        <i class="fas fa-film" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <h4 style="margin-bottom: 1rem;">No movies in database</h4>
+                        <p>Add your first movie using the "Add Movie" tab</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            moviesDatabase.forEach(movie => {
+                const item = document.createElement('div');
+                item.className = 'movie-list-item';
+                item.innerHTML = `
+                    <div class="movie-list-info">
+                        <h4>${movie.title}</h4>
+                        <p>
+                            <span><i class="fas fa-calendar"></i> ${movie.year}</span>
+                            <span><i class="fas fa-star" style="color: #ffcc00;"></i> ${movie.rating}/10</span>
+                            <span><i class="fas fa-tags"></i> ${movie.genre}</span>
+                            <span><i class="fas fa-clock"></i> ${movie.duration} min</span>
+                        </p>
+                        <p style="margin-top: 5px; font-size: 0.85rem; color: var(--accent-white); opacity: 0.7;">
+                            <i class="fas fa-link"></i> ${movie.watchLink}
+                        </p>
+                    </div>
+                    <div class="movie-list-actions">
+                        <button class="action-btn edit-btn" data-id="${movie.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn preview-btn" data-id="${movie.id}" onclick="window.open('${movie.watchLink}', '_blank')">
+                            <i class="fas fa-external-link-alt"></i> Preview
+                        </button>
+                        <button class="action-btn delete-btn" data-id="${movie.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                moviesList.appendChild(item);
+            });
+            
+            // Add event listeners for edit/delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const movieId = parseInt(e.target.closest('button').dataset.id);
+                    editMovie(movieId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const movieId = parseInt(e.target.closest('button').dataset.id);
+                    deleteMovie(movieId);
+                });
+            });
+        }
+
+        function addMovie(movieData) {
+            const newId = moviesDatabase.length > 0 
+                ? Math.max(...moviesDatabase.map(m => m.id)) + 1 
+                : 1;
+            
+            const newMovie = {
+                id: newId,
+                title: movieData.title,
+                description: movieData.description,
+                genre: movieData.genre,
+                year: parseInt(movieData.year),
+                rating: parseFloat(movieData.rating),
+                imageUrl: movieData.imageUrl,
+                watchLink: movieData.watchLink,
+                actors: movieData.actors || '',
+                duration: parseInt(movieData.duration) || 120
+            };
+            
+            moviesDatabase.push(newMovie);
+            saveMoviesDatabase();
+            loadAdminMoviesList();
+            
+            // Reset form
+            document.getElementById('movieForm').reset();
+            showNotification(`Movie "${movieData.title}" added successfully!`, 'success');
+        }
+
+        function editMovie(movieId) {
+            const movie = moviesDatabase.find(m => m.id === movieId);
+            if (!movie) return;
+            
+            // Populate form with movie data
+            document.getElementById('movieTitle').value = movie.title;
+            document.getElementById('movieYear').value = movie.year;
+            document.getElementById('movieDescription').value = movie.description;
+            document.getElementById('movieGenre').value = movie.genre;
+            document.getElementById('movieRating').value = movie.rating;
+            document.getElementById('movieImage').value = movie.imageUrl;
+            document.getElementById('movieWatchLink').value = movie.watchLink;
+            document.getElementById('movieActors').value = movie.actors;
+            document.getElementById('movieDuration').value = movie.duration || 120;
+            
+            // Change form to update mode
+            const form = document.getElementById('movieForm');
+            form.dataset.editingId = movieId;
+            form.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update Movie';
+            
+            // Switch to add movie tab
+            switchTab('add-movie');
+        }
+
+        function updateMovie(movieId, movieData) {
+            const index = moviesDatabase.findIndex(m => m.id === movieId);
+            if (index === -1) return;
+            
+            moviesDatabase[index] = {
+                ...moviesDatabase[index],
+                title: movieData.title,
+                description: movieData.description,
+                genre: movieData.genre,
+                year: parseInt(movieData.year),
+                rating: parseFloat(movieData.rating),
+                imageUrl: movieData.imageUrl,
+                watchLink: movieData.watchLink,
+                actors: movieData.actors || '',
+                duration: parseInt(movieData.duration) || 120
+            };
+            
+            saveMoviesDatabase();
+            loadAdminMoviesList();
+            
+            // Reset form
+            const form = document.getElementById('movieForm');
+            form.reset();
+            delete form.dataset.editingId;
+            form.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Add Movie';
+            
+            showNotification(`Movie "${movieData.title}" updated successfully!`, 'success');
+        }
+
+        function deleteMovie(movieId) {
+            const movie = moviesDatabase.find(m => m.id === movieId);
+            if (!movie) return;
+            
+            if (confirm(`Are you sure you want to delete "${movie.title}"?`)) {
+                moviesDatabase = moviesDatabase.filter(m => m.id !== movieId);
+                saveMoviesDatabase();
+                loadAdminMoviesList();
+                showNotification(`Movie "${movie.title}" deleted successfully!`, 'success');
+            }
+        }
+
+        // ==============================================
+        // BULK OPERATIONS
+        // ==============================================
+        function exportDatabase() {
+            const dataStr = JSON.stringify(moviesDatabase, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `cinestream-movies-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Database exported successfully!', 'success');
+        }
+
+        function importDatabase(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        moviesDatabase = importedData;
+                        saveMoviesDatabase();
+                        loadAdminMoviesList();
+                        showNotification('Database imported successfully!', 'success');
+                    } else {
+                        showNotification('Invalid database format!', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error reading file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllMovies() {
+            if (confirm('WARNING: This will delete ALL movies! Are you absolutely sure?')) {
+                moviesDatabase = [];
+                saveMoviesDatabase();
+                loadAdminMoviesList();
+                showNotification('All movies have been cleared!', 'error');
+            }
+        }
+
+        // ==============================================
+        // HELPER FUNCTIONS
+        // ==============================================
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            document.querySelectorAll('.notification').forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <div>
+                    <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong><br>
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            
+            // Update forms
+            document.querySelectorAll('.admin-form').forEach(form => {
+                form.classList.toggle('active', form.id === `${tabName}-form`);
+            });
+        }
+
+        // ==============================================
+        // INITIALIZATION
+        // ==============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize search
+            initializeSearch();
+            
+            // Render initial movies
+            renderMovies();
+            
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+                document.getElementById('mainNav').classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.getElementById('mainNav').classList.remove('active');
+                });
+            });
+            
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('adminUsername').value;
+                const password = document.getElementById('adminPassword').value;
+                
+                if (authenticate(username, password)) {
+                    isAdminAuthenticated = true;
+                    hideAdminLoginModal();
+                    showAdminPanel();
+                    showNotification('Admin login successful!', 'success');
+                } else {
+                    document.getElementById('loginError').classList.remove('hidden');
+                    document.getElementById('adminPassword').value = '';
+                    document.getElementById('adminUsername').focus();
+                }
+            });
+            
+            document.getElementById('cancelLogin').addEventListener('click', hideAdminLoginModal);
+            
+            // Admin panel events
+            document.getElementById('closeAdmin').addEventListener('click', hideAdminPanel);
+            
+            // Admin tabs
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    switchTab(tab.dataset.tab);
+                });
+            });
+            
+            // Movie form
+            document.getElementById('movieForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const form = e.target;
+                const isEditing = form.dataset.editingId;
+                
+                const movieData = {
+                    title: document.getElementById('movieTitle').value,
+                    year: document.getElementById('movieYear').value,
+                    description: document.getElementById('movieDescription').value,
+                    genre: document.getElementById('movieGenre').value,
+                    rating: document.getElementById('movieRating').value,
+                    imageUrl: document.getElementById('movieImage').value,
+                    watchLink: document.getElementById('movieWatchLink').value,
+                    actors: document.getElementById('movieActors').value,
+                    duration: document.getElementById('movieDuration').value
+                };
+                
+                if (isEditing) {
+                    updateMovie(parseInt(isEditing), movieData);
+                } else {
+                    addMovie(movieData);
+                }
+            });
+            
+            // Bulk operations
+            document.getElementById('exportBtn')?.addEventListener('click', exportDatabase);
+            document.getElementById('importBtn')?.addEventListener('click', () => {
+                document.getElementById('importFile').click();
+            });
+            
+            document.getElementById('importFile')?.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    importDatabase(file);
+                }
+            });
+            
+            document.getElementById('clearAllBtn')?.addEventListener('click', clearAllMovies);
+            
+            // Close admin panel on overlay click
+            document.getElementById('adminOverlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('adminOverlay')) {
+                    hideAdminPanel();
+                }
+            });
+            
+            // Initialize with first tab
+            switchTab('add-movie');
+            
+            // Show admin access hint
+            setTimeout(() => {
+                showNotification('Type "admin" in search bar and press Enter to access admin panel', 'info');
+            }, 3000);
+        });
+
+        // ==============================================
+        // GLOBAL ACCESS FOR HTML EVENT HANDLERS
+        // ==============================================
+        window.switchTab = switchTab;
+    </script>
+</body>
+</html>
